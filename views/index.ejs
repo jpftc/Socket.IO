@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Chat</title>
+
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+</head>
+<style>
+    #chat {
+        max-height: 500px;
+        min-height: 500px;
+        background-color: aliceblue;
+        overflow-y: scroll;
+    }
+</style>
+
+<div class="container">
+
+    <body>
+        <h1>Chat para estudos!</h1>
+        <div id="chat" class="container">
+
+        </div><br>
+        <input type="text" name="msg" id="msg" class="form-control" placeholder="Mensagem..."><br>
+        <input type="text" name="username" id="username" placeholder="Seu nome de usuário!" class="form-control"><br>
+        <button onclick="enviar()" class="btn btn-primary btn-lg btn-block">Enviar</button>
+</div>
+
+</body>
+
+<!-- Importando socket.io no frontend -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.1/socket.io.js"></script>
+<script>
+    // COnectando socket do frontend com socket do backend
+    var socket = io("http://localhost:3000");
+
+    // Dsconexão do cliente
+    socket.on("disconnect", () => {
+        console.log("Desconectado")
+    });
+
+    // Capturando evento do backend
+    socket.on("showmsg", (data) => {
+        console.log(data);
+
+        // Colocando mensagem dentro da div
+        var chat = document.getElementById("chat");
+        var p = document.createElement("p");
+        p.innerHTML = data.username + ": " + data.msg;
+        chat.append(p);
+    });
+
+    // Função para capturar valor dos campos e enviar a mensagem
+    function enviar() {
+        var msgField = document.getElementById("msg");
+        var usernameField = document.getElementById("username");
+
+        var msg = msgField.value;
+        var username = usernameField.value;
+
+        // Emitindo evento para o backend via socket
+        socket.emit("msg", {
+            msg: msg,
+            username: username
+        });
+
+    }
+</script>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+
+<script src="/js/bootstrap.min.js"></script>
+
+</html>
